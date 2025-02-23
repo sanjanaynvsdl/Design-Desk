@@ -1,1 +1,1 @@
-{"root":["./src/index.ts"],"version":"5.7.3"}
+{"root":["./src/index.ts","./src/routes/customerroutes.ts","./src/routes/orderroutes.ts","./src/routes/userroutes.ts","./src/routes/workerroutes.ts","./src/schema/db.ts","./src/middlewares/usermiddleware.ts","./src/utils/createinvoice.ts","./src/utils/sendemailofinvoice.ts"],"version":"5.7.3"}
