@@ -36,7 +36,7 @@ const workersSchema = z.object({
             amount:z.coerce.number({required_error:"Amount for the work is required!"}).positive()
 
         })
-    )
+    ).optional()
 });
 
 const dailyWorkSchema = z.object({
@@ -53,6 +53,7 @@ type dailyWorkTypes = z.infer<typeof dailyWorkSchema>
 
 
 //create a worker
+//todo:check from frotend, weather work Data is required or not,
 workerRouter.post("/", userMiddleware, async(req:Request,res:Response)=> {
     try {
         const result = workersSchema.safeParse(req.body);
@@ -75,7 +76,7 @@ workerRouter.post("/", userMiddleware, async(req:Request,res:Response)=> {
             place:place,
             description:description,
             joinDate:joinDate,
-            workData:workData,
+            workData:[],
             adminId:adminId,
         });
 

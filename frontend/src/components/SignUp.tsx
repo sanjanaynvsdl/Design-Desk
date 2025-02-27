@@ -16,10 +16,10 @@ const SignUp = () => {
   };
 
   return (
-    <div className="bg-white px-14 py-12 inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-xl mb-[100px]">
+    <div className="bg-white md:px-14 px-6 md:py-12 py-8   inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-xl mb-[100px]">
       <div className="flex flex-col">
         <p className="text-2xl font-bold mb-4">SIGN UP</p>
-        <p className="mb-3 text-md">
+        <p className="mb-3 md:text-md text-sm">
           Streamline your work with ease
           <br />
           —Sign up today!
@@ -51,12 +51,12 @@ const SignUp = () => {
 
         <button
           onClick={handleSignUp}
-          className="bg-[#875479] text-white text-lg m-1 p-2 rounded-xs transition transform hover:scale-102 cursor-pointer active:scale-95"
+          className="bg-[#875479] text-white text-lg m-1 md:p-2 p-1 md:m-1 mx-1 rounded-xs transition transform hover:scale-102 cursor-pointer active:scale-95"
         >
           Submit
         </button>
 
-        <p className="text-sm mt-2">Already have an account? SignIn </p>
+        <p className="md:text-sm mt-2 text-xs">Already have an account? SignIn </p>
       </div>
     </div>
   );
