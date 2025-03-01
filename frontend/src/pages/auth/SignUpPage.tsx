@@ -1,7 +1,11 @@
-import SignUp from "../components/SignUp";
-import womenAtDesk from "../assets/womenAtDesk2.png";
+import SignUp from "../../components/SignUp";
+import womenAtDesk from "../../assets/womenAtDesk2.png";
 
 const SignUpPage = () => {
+
+  
+
+
   return (
     <div className="bg-gradient-to-br from-[#9C668F] via-[#6E4662] to-[#362130]  min-h-screen w-full flex flex-col  justify-center items-center ">
 

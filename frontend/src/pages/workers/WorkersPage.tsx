@@ -1,77 +1,47 @@
 import { useState } from "react";
-import Button from "../components/ui/Button";
-import WorkerModal from "../components/workers/WorkerModal";
+import Button from "../../components/ui/Button";
+import WorkerModal from "../../components/workers/WorkerModal";
 import { UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { formatDate } from "../utils/format-date";
+import { formatDate } from "../../utils/format-date";
+import { workersAtom } from "../../store/workers-store";
+import { useRecoilValueLoadable } from "recoil";
+import LoadingComp from "../../components/ui/LoadingComp";
+import ErrorComp from "../../components/ui/ErrorComp";
+import EmptyState from "../../components/ui/EmptyState";
 
 const WorkersPage = () => {
   const [isModal, setIsModal] = useState<boolean>(false);
+  const workers = useRecoilValueLoadable(workersAtom);
+  const navigate = useNavigate();
 
-  //todo: GET workers data from backend use recoil
+  if (workers.state == "loading") {
+    return <LoadingComp />;
+  }
 
-  const workers= [
-        {
-          _id: "67bb38342cb4338eb5f7d0eb",
-          name: "Renuka",
-          email: "Renuka@gmail.com",
-          phoneNo: "7689256789",
-          place: "Gdwl",
-          description: "all-rounded",
-          joinDate: "2025-01-02T18:30:00.000Z",
-          workData: [
-                {
-                  date: "2025-01-11T18:30:00.000Z",
-                  work: "project",
-                  amount: 300,
-                  _id: "67bb38342cb4338eb5f7d0ec"
-                }
-            ],
-            adminId: "67bb31c378179da0470bd052",
-            __v: 0
-        },
-        {
-          _id: "67bb38872cb4338eb5f7d0fa",
-          name: "Roja",
-          email: "Roja1@gmail.com",
-          phoneNo: "7689256789",
-          place: "Gdwl",
-          description: "all-rounded",
-          joinDate: "2025-01-02T18:30:00.000Z",
-          workData: [
-                {
-                  date: "2025-08-02T18:30:00.000Z",
-                  work: "project",
-                  amount: 300,
-                  _id: "67bb38872cb4338eb5f7d0fb"
-                },
-                {
-                  date: "2025-09-02T18:30:00.000Z",
-                  work: "Lehanga",
-                  amount: 25000,
-                  _id: "67bb38dd2cb4338eb5f7d107"
-                }
-            ],
-            adminId: "67bb31c378179da0470bd052",
-            __v: 0
-        }
-    ]
-  
+  if (workers.state == "hasError") {
+    return <ErrorComp message={workers.contents?.message} />;
+  }
 
   const tableInpStyles = "text-center px-4 py-2 border-1 border-gray-500";
-  const btnStyles ="px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
-  const navigate = useNavigate();
+  const btnStyles =
+    "px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
 
   //todo: connect to BE" to delete a worker
   const handleDelete = () => {};
 
   return (
-    <div className="">
+    <div className=" flex flex-col justify-center items-center">
+      {workers.contents.length > 0 &&  <p className="text-2xl font-bold my-1">View and manage your list of workers!</p>}
       <div className="flex justify-center items-center gap-4  p-2">
-        <input
-          placeholder="Search for a worker"
-          className="outline-none pr-8 pl-2 py-2 bg-white  border-1 border-[#797474] rounded-xs"
-        />
+        {workers.contents?.length > 0 ? (
+          <input
+            placeholder="Search for a worker"
+            className="outline-none pr-8 pl-2 py-2 bg-white  border-1 border-[#797474] rounded-xs"
+          />
+        ) : (
+          <div></div>
+        )}
         <Button
           Icon={<UserRound />}
           text="Add Worker"
@@ -82,7 +52,12 @@ const WorkersPage = () => {
         )}
       </div>
       <div className="flex justify-center">
-        {workers && (
+        {workers.contents?.length == 0 ? (
+          <EmptyState
+            subHeading="No Workers Yet!"
+            message="Click on the 'Add' button above to add a new worker and see them listed here."
+          />
+        ) : (
           <table className="bg-white ">
             <thead className="bg-[#ddc4da]">
               <tr>
@@ -97,17 +72,19 @@ const WorkersPage = () => {
               </tr>
             </thead>
             <tbody>
-              {workers.map((worker, index) => (
+              {workers.contents.map((worker, index) => (
                 <tr key={index}>
                   <td className={`${tableInpStyles}`}>{index + 1}</td>
                   <td className={`${tableInpStyles}`}>{worker.name}</td>
                   <td className={`${tableInpStyles}`}>{worker.phoneNo}</td>
                   <td className={`${tableInpStyles}`}>{worker.email}</td>
                   <td className={`${tableInpStyles}`}>{worker.place}</td>
-                  <td className={`${tableInpStyles}`}>{formatDate(worker.joinDate)}</td>
+                  <td className={`${tableInpStyles}`}>
+                    {formatDate(worker.joinDate)}
+                  </td>
                   <td className={`${tableInpStyles} `}>
                     <button
-                    onClick={()=>navigate(`/workers/${worker._id}`)}
+                      onClick={() => navigate(`/workers/${worker._id}`)}
                       className={`${btnStyles} bg-[#ecdeea] hover:bg-[#ddc4da]`}
                     >
                       Get-Details

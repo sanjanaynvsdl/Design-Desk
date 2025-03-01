@@ -94,10 +94,10 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
     }, secret_key, { expiresIn: "6d" });
 
     res.cookie("admin_token", token, {
-        httpOnly: true,
+        httpOnly: false,
         maxAge: 3 * 24 * 60 * 60 * 1000,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax", //will send cookies only in first-party context, not to other website requests!
+        secure: false,  //todo: set to true in prod.
       })
       .status(200)
       .json({ message: "Successfully signed up!" });
@@ -165,10 +165,10 @@ userRouter.post("/signin", async (req: Request, res: Response) => {
     const token = jwt.sign({userId:findUser._id}, secret_key, {expiresIn:'6d'});
 
     res.cookie("admin_token",token, {
-        httpOnly:true,
-        maxAge:3*24*60*60*1000,
-        sameSite:'strict',
-        secure:process.env.NODE_ENV=="production"
+        httpOnly: false,
+        maxAge: 3 * 24 * 60 * 60 * 1000,
+        sameSite: 'lax', // Use 'lax' for development (sends cookie in only first-party req, not to other websites)
+        secure: false //todo: Set to true in production with HTTPS
     });
 
     res.status(200).json({

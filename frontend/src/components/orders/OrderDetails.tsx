@@ -1,28 +1,27 @@
 import { useState } from "react";
 import UpdateOrder from "./UpdaterOrder";
 
-interface orderDetailProps{
-  id:string,
-  ordersData:orderDataTypes[],
-  totalAmount:number,
-  orderStatus:string,
-  description:string,
-  deliveryDate:string,
-  paymentStatus:string,
-  createdAt:string,
+interface orderDetailProps {
+  id: string;
+  ordersData: orderDataTypes[];
+  totalAmount: number;
+  orderStatus: string;
+  description: string;
+  deliveryDate: string;
+  paymentStatus: string;
+  createdAt: string;
 }
 
-interface orderDataTypes{
-  title:string,
-  quantity:number,
-  unitPrice:number,
-  totalPrice:number,
+interface orderDataTypes {
+  title: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
 }
 
-const OrderDetails = (props:orderDetailProps) => {
+const OrderDetails = (props: orderDetailProps) => {
   const [isOrderUpate, setIsOrderUpdate] = useState<boolean>(false);
 
-  
   //todo:connect backend to del with that id
   const handleDelete = () => {};
   // console.log(props);
@@ -31,8 +30,10 @@ const OrderDetails = (props:orderDetailProps) => {
   const buttonStyles ="bg-[#c79fc0] text-sm cursor-pointer hover:scale-100 transition transform hover:bg-[#b381a9]  px-2 py-1 mr-2  rounded-xs outline-none ";
   return (
     <div className="bg-white p-8 border-1 border-[#e3e3e3] shadow-xs rounded-xs text-start">
-
-      <p className="font-bold mb-2">{props.createdAt} <span className="text-sm font-normal">   (Ordered-on)  </span></p>
+      <p className="font-bold mb-2">
+        {props.createdAt}{" "}
+        <span className="text-sm font-normal"> (Ordered-on) </span>
+      </p>
       <hr className="w-full border-t border-gray-800 opacity-50" />
 
       <p className="text-xs my-2">
@@ -40,7 +41,6 @@ const OrderDetails = (props:orderDetailProps) => {
         <br />
         {props.description}
       </p>
-
 
       <p className="font-medium : my-2 ">Order Data</p>
       <div className="">
@@ -67,12 +67,23 @@ const OrderDetails = (props:orderDetailProps) => {
         )}
       </div>
 
-
-      <div className="my-2 text-xs flex flex-col gap-2 my-4  ">
-        <p><span className="font-bold">Total Amount : </span>{props.totalAmount}</p>
-        <p><span className="font-bold">Order Status : </span>{props.orderStatus}</p>
-        <p><span className="font-bold">Delivery date : </span>{props.deliveryDate}</p>
-        <p><span className="font-bold">Payment Status : </span>{props.paymentStatus}</p>
+      <div className="text-xs flex flex-col gap-2 my-4  ">
+        <p>
+          <span className="font-bold">Total Amount : </span>
+          {props.totalAmount}
+        </p>
+        <p>
+          <span className="font-bold">Order Status : </span>
+          {props.orderStatus}
+        </p>
+        <p>
+          <span className="font-bold">Delivery date : </span>
+          {props.deliveryDate}
+        </p>
+        <p>
+          <span className="font-bold">Payment Status : </span>
+          {props.paymentStatus}
+        </p>
       </div>
       <div className="flex flex-start">
         <button onClick={() => setIsOrderUpdate(true)} className={buttonStyles}>
@@ -83,7 +94,6 @@ const OrderDetails = (props:orderDetailProps) => {
         </button>
       </div>
 
-      
       {isOrderUpate && (
         <UpdateOrder
           id={props.id}

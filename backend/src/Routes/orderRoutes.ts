@@ -37,10 +37,10 @@ const orderSchema = z.object({
         
     totalAmount:z.coerce.number().positive(),
     //coerce , if user-gives an "21" => converts to num => 21
-    orderStatus:z.string({required_error:"Order status is required!"}),
+    orderStatus:z.string({required_error:"Order status is required!"}).optional(),
     description:z.string({required_error:"Description for order is required"}),
     deliveryDate:z.coerce.date({required_error:"Delivery date is required!"}),
-    paymentStatus:z.string({required_error:"Payment status is required!"})
+    paymentStatus:z.string({required_error:"Payment status is required!"}).optional(),
 });
 
 const partialOrderSchema = orderSchema.partial(); //for-update-inp validation
@@ -65,7 +65,7 @@ orderRouter.post("/", userMiddleware, async(req:Request,res:Response)=>{
         // console.log(result.data);
 
         const {name, email, phoneNo, place}:orderTypes=result.data;
-        const {ordersData,totalAmount, orderStatus,description,  deliveryDate , paymentStatus }:orderTypes = result.data;
+        const {ordersData,totalAmount, description,  deliveryDate}:orderTypes = result.data;
 
         const findExistingCustomer = await Customers.findOne({
             email:email,
@@ -91,10 +91,10 @@ orderRouter.post("/", userMiddleware, async(req:Request,res:Response)=>{
             customerId:customerId,
             ordersData:ordersData,
             totalAmount:totalAmount,
-            orderStatus:orderStatus,
+            orderStatus:"Pending",
             description:description,
             deliveryDate:deliveryDate,
-            paymentStatus:paymentStatus,
+            paymentStatus:"Pending",
             adminId:req.userId
         });
 

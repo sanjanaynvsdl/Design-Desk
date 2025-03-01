@@ -1,44 +1,105 @@
 import { useState } from "react";
-import Input from "../components/ui/Input"
+import Input from "../components/ui/Input";
+import { axiosInstance } from "../utils/api/axios-instance";
+import { Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
-const SignIn= ()=>{
+const SignIn = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-    const [email, setEmail]=useState<string>("");
-    const [password, setPassword]=useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    //todo:Connect BE
-    const handleSignIn=()=>{
+  const navigate = useNavigate();
 
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await axiosInstance.post("/auth/signin", {
+        email: email,
+        password: password,
+      });
+
+      console.log(response.data);
+      navigate("/");
+    } catch (error: any) {
+      console.error(error);
+      if (error.response) {
+        setError(error.response.data.message || "An error occurred!");
+      } else {
+        setError("Please try again later, An error occurred!");
+      }
+
+      setTimeout(() => {
+        setError(null);
+      }, 4000);
+    } finally {
+      setIsLoading(false);
     }
-    return(
-        <div className="bg-white md:px-10  px-4 md:py-12 py-6 inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-lg mb-[100px]">
-            <div className="flex flex-col">
-            <p className="text-2xl font-bold mb-4">SIGN IN</p>
-                <Input
-                    placeholder="Email"
-                    type="text"
-                    value={email}
-                    onChange={(e)=>setEmail(e.target.value)}
-                />
-                <Input
-                    placeholder="Password"
-                    type="password"
-                    value={password}
-                    onChange={(e)=>setPassword(e.target.value)}
-                />
+  };
+  return (
+    <div className="bg-white md:px-10  px-4 md:py-12 py-6 inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-lg mb-[100px]">
+      <form onSubmit={handleSignIn}>
+        <div className="flex flex-col">
+          <p className="text-2xl font-bold mb-4">SIGN IN</p>
+          <Input
+            placeholder="Email"
+            type="text"
+            value={email}
+            required={true}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            placeholder="Password"
+            type="password"
+            value={password}
+            required={true}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-                <button 
-                    onClick={handleSignIn}
-                    className="bg-[#875479] text-white text-lg md:m-1 m-1 py-1 rounded-xs transition transform hover:scale-102 cursor-pointer active:scale-95">
-                Submit
+        {/* //submit button */}
+          <div className="flex justify-center ">
+            <button
+              disabled={isLoading}
+              type="submit"
+              className={`bg-[#875479] text-white text-md w-60 p-2 my-1 rounded-xs transition transform active:scale-95 
+                ${
+                  isLoading
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:scale-102 cursor-pointer"
+                }`}
+            >
+              {isLoading ? (
+                <div className="flex justify-center items-center gap-4">
+                  <Loader2 className="animate-spin " />
+                  <p>Loading . . .</p>
+                </div>
+              ) : (
+                "Submit"
+              )}
             </button>
-            {/* //todo:Add Link */}
-            <p className="md:text-sm mt-2 text-xs">Don't have an account? SignUp</p>
+          </div>
+          <div className="flex justify-center">
+            {error && (
+              <p className="w-60  break-words overflow-hidden text-xs text-red-500 my-2 bg-red-100 p-2 rounded-sm border-1 border-red-300">
+                {error}
+              </p>
+            )}
+          </div>
 
-            </div>
-
+          <p className="sm:text-md mt-2 text-sm">
+            Don't have an account?{"  "}
+            <Link to="/signup" className="text-blue-600 underline">
+              SignUp
+            </Link>
+          </p>
         </div>
-    )
-}
+      </form>
+    </div>
+  );
+};
 
 export default SignIn;

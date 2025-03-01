@@ -6,6 +6,7 @@ interface InputProps {
   type: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?:boolean,
 }
 
 const Input = (props: InputProps) => {
@@ -15,11 +16,12 @@ const Input = (props: InputProps) => {
   return (
     <div className="relative w-full">
       <input
-        className="md:px-4  px-1  text-xs sm:text-lg  w-60 md:py-3  py-2 m-1 outline-0 border-1 border-[#a19d9d] bg-[#f5eef4]"
+        className="md:px-4  px-4 text-sm sm:text-md  w-60 md:py-3  py-2 m-1 outline-0 border-1 border-[#a19d9d] bg-[#f5eef4]"
         type={isPassword && !showPassword ? "password" : "text"}
         value={props.value}
         placeholder={props.placeholder}
         onChange={props.onChange}
+        required={props.required}
       />
       {isPassword && (
         <button

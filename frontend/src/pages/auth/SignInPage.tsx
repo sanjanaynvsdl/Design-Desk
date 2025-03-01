@@ -1,5 +1,5 @@
-import laptopsignin from "../assets/laptopsignin.png";
-import SignIn from "../components/SIignIn";
+import laptopsignin from "../../assets/laptopsignin.png";
+import SignIn from "../../components/SIignIn";
 
 const SignInPage = () => {
   return (
