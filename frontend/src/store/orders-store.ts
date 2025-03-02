@@ -1,4 +1,4 @@
-import { atom, atomFamily, selector, selectorFamily, useRecoilState, useSetRecoilState } from "recoil";
+import { atom, atomFamily, selector, selectorFamily, useSetRecoilState } from "recoil";
 import { axiosInstance } from "../utils/api/axios-instance";
 import {CustomerDetailedTypes} from "./customers-store";
 
