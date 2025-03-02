@@ -14,11 +14,33 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+const origins = process.env.FRONTEND_URL?.split(",");
+const allowedOrigins:cors.CorsOptions = {
+  origin:(origin, callback)=>{
 
-app.use(cors({
-  origin:'http://localhost:5173',
-  credentials:true
-}));
+    //allow same origin
+    if(!origin) {
+      return callback(null, true);
+    }
+
+    if(process.env.NODE_ENV=="development" || origins?.indexOf(origin)!==-1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by cors!"));
+    }
+  },
+
+  credentials:true,
+  methods:["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders:['content-type', 'Authorization']
+
+}
+
+app.use(cors(allowedOrigins));
+
+app.get("/", (req,res)=>{
+  res.json("Less go, Working!")
+});
 
 
 const PORT = process.env.PORT;
