@@ -13,7 +13,7 @@ import SingleWorkerPage from "./pages/workers/SingleWorkerPage";
 import MyProfilePage from "./pages/MyProfilePage";
 import ViewWorkPage from "./pages/workers/ViewWorkPage";
 import ErrorPage from "./pages/ErrorPage";
-import ProtectedRoute from "./components/Protected-route";
+// import ProtectedRoute from "./components/Protected-route";
 
 function App() {
   return (
