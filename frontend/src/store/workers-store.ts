@@ -1,4 +1,4 @@
-import { selector,atom, atomFamily, selectorFamily, useSetRecoilState, useRecoilValue } from "recoil";
+import { selector,atom, atomFamily, selectorFamily, useSetRecoilState } from "recoil";
 import { axiosInstance } from "../utils/api/axios-instance";
 
 export interface WorkerTypes {

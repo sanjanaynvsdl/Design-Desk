@@ -2,7 +2,6 @@ import { CircleX, Loader2 } from "lucide-react";
 import { LuClipboardCheck } from "react-icons/lu";
 import { axiosInstance } from "../../utils/api/axios-instance";
 import { useEffect, useState } from "react";
-import ErrorComp from "../ui/ErrorComp";
 import ErrorMsg from "../ui/ErrorMsg";
 import SuccessMsg from "../ui/SuccessMsg";
 

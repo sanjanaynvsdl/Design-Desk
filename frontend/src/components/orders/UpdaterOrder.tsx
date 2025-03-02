@@ -5,7 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { axiosInstance } from "../../utils/api/axios-instance";
 import ErrorMsg from "../ui/ErrorMsg";
 import SuccessMsg from "../ui/SuccessMsg";
-import { useRefreshAllOrders, useRefreshOrder } from "../../store/orders-store";
+import { useRefreshAllOrders } from "../../store/orders-store";
 
 interface updateOrderTypes {
   isOpen: boolean;
@@ -37,7 +37,7 @@ const UpdateOrder = (props: updateOrderTypes) => {
 
   //update UI, on successfull update
   const refreshOrder = useRefreshAllOrders();
-  const refreshSingleOrder = useRefreshOrder(props.id);
+  // const refreshSingleOrder = useRefreshOrder(props.id);
 
 
   //update-order

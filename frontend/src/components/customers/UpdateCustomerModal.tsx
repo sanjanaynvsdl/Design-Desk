@@ -4,7 +4,6 @@ import Input from "../ui/Input";
 import { axiosInstance } from "../../utils/api/axios-instance";
 import ErrorMsg from "../ui/ErrorMsg";
 import SuccessMsg from "../ui/SuccessMsg";
-import {useRecoilValue, useRecoilValueLoadable} from 'recoil'
 import {useRefreshAllCustomers} from "../../store/customers-store";
 
 interface updateCustomerTypes {
