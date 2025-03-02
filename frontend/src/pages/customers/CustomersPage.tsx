@@ -18,6 +18,8 @@ const CustomersPage = () => {
   const [isModal, setIsModal] = useState(false);
   const customers = useRecoilValueLoadable(customersAtom);
 
+
+  const [searchQuery, setSearchquery]=useState<string>("");
   const [error, setErrMsg]=useState<string|null>(null);
   const [success, setSuccessMsg]=useState<string|null>(null);
   const refreshAllCustomers=useRefreshAllCustomers();
@@ -36,7 +38,10 @@ const CustomersPage = () => {
     "px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
 
   
-
+const filteredCustomers = customers.contents.filter((customer)=>(
+  customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  customer.email.toLowerCase().includes(searchQuery.toLowerCase())
+))
     //delete-customer (id)
   const handleDelCustomer = async(id:string) => {
     try {
@@ -82,6 +87,8 @@ const CustomersPage = () => {
       <div className="flex justify-center items-center gap-4  p-2">
         {customers.contents.length > 0 ? (
           <input
+          value={searchQuery}
+            onChange={(e)=>setSearchquery(e.target.value)}
             placeholder="Search for a customer"
             className="outline-none px-2 py-2 bg-white  border-1 border-[#797474] rounded-xs"
           />
@@ -104,6 +111,9 @@ const CustomersPage = () => {
         <CustomerModal isOpen={isModal} onClose={() => setIsModal(false)} />
       )}
 
+      <div className="flex justify-center my-4">
+        {searchQuery!=="" &&  filteredCustomers.length==0 && <EmptyState message="No customer matches with you search query"/>}
+      </div>
       <div className="flex justify-center">
         {customers.contents.length == 0 ? (
           <EmptyState
@@ -112,7 +122,9 @@ const CustomersPage = () => {
           />
         ) : (
           <table className="bg-white shadow-xl border-1 border-[#e3e3e3]">
+            {filteredCustomers.length>0 && 
             <thead className="bg-[#ddc4da]">
+              
               <tr>
                 <th className={`${tableStyles}`}>S.No.</th>
                 <th className={tableStyles}>Name</th>
@@ -123,10 +135,10 @@ const CustomersPage = () => {
                 <th className={tableStyles}>Delete Customer</th>
                 {/* <th className={tableStyles}>Update User</th> */}
               </tr>
-            </thead>
+            </thead> }
 
             <tbody>
-              {customers.contents.map((customer, index) => (
+              {filteredCustomers.map((customer, index) => (
                 <tr key={index}>
                   <td className={tableStyles}>{index + 1}</td>
                   <td className={tableStyles}>{customer.name}</td>

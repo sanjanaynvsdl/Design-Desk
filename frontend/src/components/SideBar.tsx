@@ -6,21 +6,28 @@ import { IoPersonAddOutline } from "react-icons/io5";
 import { GoPerson } from "react-icons/go";
 import { TfiAlignCenter } from "react-icons/tfi";
 import { useNavigate } from "react-router-dom";
+import {LuLogOut} from 'react-icons/lu';
+import Cookies from "js-cookie";
 
 interface SideBarTypes {
   isOpen: boolean;
   setIsOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
 }
 
+
+
 const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
-  const [currPage, setCurrPage] = useState<
-    "Home" | "Orders" | "Customers" | "Workers" | "My Profile"
-  >("Home");
+  const [currPage, setCurrPage] = useState<"Home" | "Orders" | "Customers" | "Workers" | "My Profile" | "">("");
   const navigate = useNavigate();
 
+  const handleLogout=()=>{
+    Cookies.remove('admin_token');
+    navigate("/signin");
+  }
+  
   return (
     <div
-      className={`fixed bg-white h-screen flex flex-col gap-2 border-r border-gray-300 transition-all duration-300
+      className={`fixed bg-white h-screen flex flex-col border-r border-gray-300 transition-all duration-300
             ${isOpen ? "w-72" : "w-20"}`}
     >
       <div className="px-4 py-2 my-2 mx-1 flex justify-start items-center gap-4">
@@ -36,6 +43,8 @@ const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
           </p>
         )}
       </div>
+
+      <div className="flex flex-col gap-2 flex-grow">
       <SideBarItem
         text="Home"
         isOpen={isOpen}
@@ -89,6 +98,16 @@ const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
         }}
         StartIcon={<GoPerson size={23} />}
       />
+      </div>
+      <div
+        onClick={handleLogout}
+        className="m-4 mt-auto mb-8 hover:bg-[#ddc4da] cursor-pointer rounded-xl"
+      >
+        <div className="flex justify-start items-center m-2 text-lg  rounded-xl p-2 cursor-pointer transition-all duration-400">
+          <LuLogOut />
+          <p className="pl-4">Log out</p>
+        </div>
+      </div>
     </div>
   );
 };
@@ -98,7 +117,7 @@ export default SideBar;
 interface SideBarItemTypes {
   text: string;
   onClick: () => void;
-  currPage: "Home" | "Orders" | "Customers" | "Workers" | "My Profile";
+  currPage: "Home" | "Orders" | "Customers" | "Workers" | "My Profile" | ""
   navigateTo: () => void;
   StartIcon: any;
   isOpen: boolean;

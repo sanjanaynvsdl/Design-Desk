@@ -26,6 +26,8 @@ const WorkersPage = () => {
   //hook, to render UI after successful del
   const refreshAllWorkers=useRefreshAllWorkers();
 
+  const [searchQuery, setSearchquery]=useState<string>("");
+
 
 
   if (workers.state == "loading") {
@@ -38,6 +40,11 @@ const WorkersPage = () => {
 
   const tableInpStyles = "text-center px-4 py-2 border-1 border-gray-500";
   const btnStyles ="px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
+
+  const filteredWorkers = workers.contents.filter((worker)=>(
+    worker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    worker.email.toLowerCase().includes(searchQuery.toLocaleLowerCase())
+  ));
 
   
   const handleDelete = async(id:string) => {
@@ -78,6 +85,8 @@ const WorkersPage = () => {
       <div className="flex justify-center items-center gap-4  p-2">
         {workers.contents?.length > 0 ? (
           <input
+          value={searchQuery}
+          onChange={(e)=>setSearchquery(e.target.value)}
             placeholder="Search for a worker"
             className="outline-none pr-8 pl-2 py-2 bg-white  border-1 border-[#797474] rounded-xs"
           />
@@ -98,14 +107,18 @@ const WorkersPage = () => {
         {success && <SuccessMsg message={success}/>}
 
       </div>
+
+      {searchQuery!=="" &&  filteredWorkers.length==0 && <EmptyState message="No worker matches with you search query"/>}
       <div className="flex justify-center">
         {workers.contents?.length == 0 ? (
           <EmptyState
             subHeading="No Workers Yet!"
             message="Click on the 'Add' button above to add a new worker and see them listed here."
           />
-        ) : (
+        ) : ( 
+          
           <table className="bg-white ">
+            {filteredWorkers.length>0 && 
             <thead className="bg-[#ddc4da]">
               <tr>
                 <th className={`${tableInpStyles}`}>S No.</th>
@@ -117,9 +130,9 @@ const WorkersPage = () => {
                 <th className={`${tableInpStyles}`}>Complete Details</th>
                 <th className={`${tableInpStyles}`}>Delete-Worker</th>
               </tr>
-            </thead>
+            </thead> }
             <tbody>
-              {workers.contents.map((worker, index) => (
+              {filteredWorkers.map((worker, index) => (
                 <tr key={index}>
                   <td className={`${tableInpStyles}`}>{index + 1}</td>
                   <td className={`${tableInpStyles}`}>{worker.name}</td>
