@@ -7,7 +7,8 @@ import { GoPerson } from "react-icons/go";
 import { TfiAlignCenter } from "react-icons/tfi";
 import { useNavigate } from "react-router-dom";
 import {LuLogOut} from 'react-icons/lu';
-import Cookies from "js-cookie";
+import { axiosInstance } from "../utils/api/axios-instance";
+import ErrorMsg from "./ui/ErrorMsg";
 
 interface SideBarTypes {
   isOpen: boolean;
@@ -19,10 +20,30 @@ interface SideBarTypes {
 const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
   const [currPage, setCurrPage] = useState<"Home" | "Orders" | "Customers" | "Workers" | "My Profile" | "">("");
   const navigate = useNavigate();
+  const [err, setErrMsg]=useState<string|null>(null);
 
-  const handleLogout=()=>{
-    Cookies.remove('admin_token');
-    navigate("/signin");
+  const handleLogout=async()=>{
+    try {
+      setErrMsg(null);
+      const response = await axiosInstance.post("/auth/logout");
+      console.log(response.data);
+      navigate("/signin");
+
+
+    } catch (error:any) {
+      console.error(`Error, failed to logout!`);
+      if(error.response) {
+        setErrMsg(error.response?.data?.message || "Failed to logout!");
+      } else {
+        setErrMsg("Failed to logout")!
+      }
+
+      const timer = setTimeout(()=>{
+        setErrMsg(null);
+    },3000)
+
+    return ()=>clearTimeout(timer);
+    }
   }
   
   return (
@@ -99,6 +120,7 @@ const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
         StartIcon={<GoPerson size={23} />}
       />
       </div>
+      <div className="flex justify-center text-center">{err && <ErrorMsg message={err}/>}</div>
       <div
         onClick={handleLogout}
         className="m-4 mt-auto mb-8 hover:bg-[#ddc4da] cursor-pointer rounded-xl"

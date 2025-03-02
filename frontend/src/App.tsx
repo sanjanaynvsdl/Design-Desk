@@ -13,7 +13,7 @@ import SingleWorkerPage from "./pages/workers/SingleWorkerPage";
 import MyProfilePage from "./pages/MyProfilePage";
 import ViewWorkPage from "./pages/workers/ViewWorkPage";
 import ErrorPage from "./pages/ErrorPage";
-// import ProtectedRoute from "./components/Protected-route";
+import ProtectedRoute from "./components/Protected-route";
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
           <Route path="/signin" element={<SignInPage />} />
 
           {/* Protected routes */}
-          {/* <Route element={<ProtectedRoute />}> */}
+          <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/orders" element={<OrdersPage />} />
@@ -37,7 +37,7 @@ function App() {
               <Route path="/customers/:id" element={<SingleCustomerPage />} />
               <Route path="/workers/:id" element={<SingleWorkerPage />} />
             </Route>
-          {/* </Route> */}
+          </Route>
 
           {/* //workersdata- sharable link,  */}
           <Route path="/workers/share/:hash" element={<ViewWorkPage />} />

@@ -94,10 +94,10 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
     }, secret_key, { expiresIn: "6d" });
 
     res.cookie("admin_token", token, {
-        httpOnly: false,
-        maxAge: 3 * 24 * 60 * 60 * 1000,
-        sameSite: "lax", //will send cookies only in first-party context, not to other website requests!
-        secure: false,  //todo: set to true in prod.
+        httpOnly: true,   // Prevent frontend JavaScript from reading it
+        secure: true,     // Required for HTTPS (Vercel is HTTPS)
+        sameSite:'none', // Required for cross-origin cookies
+        maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
       })
       .status(200)
       .json({ message: "Successfully signed up!" });
@@ -165,10 +165,10 @@ userRouter.post("/signin", async (req: Request, res: Response) => {
     const token = jwt.sign({userId:findUser._id}, secret_key, {expiresIn:'6d'});
 
     res.cookie("admin_token",token, {
-        httpOnly: false,
-        maxAge: 3 * 24 * 60 * 60 * 1000,
-        sameSite: 'lax', // Use 'lax' for development (sends cookie in only first-party req, not to other websites)
-        secure: false //todo: Set to true in production with HTTPS
+       httpOnly: true,    // doesn't allow FE from readinng it using js
+        secure: true,     // Required for HTTPS (Vercel is HTTPS)
+        sameSite: 'none', // Required for cross-origin cookies
+        maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
     });
 
     res.status(200).json({
@@ -278,5 +278,35 @@ userRouter.put("/profile",userMiddleware,  async (req: Request, res: Response) =
         });
     }
 });
+
+//check-auth
+userRouter.get("/check-auth", async(req:Request,res:Response)=>{
+    const token = req.cookies.admin_token;
+    if (!token) {
+         res.status(401).json({ message: "Not authenticated" });
+         return;
+    }
+
+    res.status(200).json({ message: "Authenticated" });
+});
+
+//logout
+userRouter.post("/logout", async(req:Request,res:Response)=>{
+
+    try {
+        res.clearCookie("admin_token", {
+            httpOnly: true,
+            secure: true,   
+            sameSite: 'none'
+        });
+    
+        res.status(200).json({ message: "Logged out successfully!" });
+        return;
+    } catch (error) {
+        console.log(`Error in logout functionality ${error}`);
+        res.status(500).json({message:"Internal server error in logout!"})
+        
+    }
+})
 
 export default userRouter;

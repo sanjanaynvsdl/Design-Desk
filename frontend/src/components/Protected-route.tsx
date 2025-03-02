@@ -1,19 +1,25 @@
-import Cookies from 'js-cookie';
-import {Navigate, Outlet} from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { axiosInstance } from "../utils/api/axios-instance"; 
 
-const ProtectedRoute = ()=>{
-    const authToken = Cookies.get('admin_token');
+const ProtectedRoute = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean|null>(null); 
 
-    console.log("Coookie Value : "+authToken);
-    console.log("All cookies : " +document.cookie);
+    useEffect(() => {
+        const checkAuth = async()=>{
+            try {
+                await axiosInstance.get('/auth/check-auth');
+                setIsAuthenticated(true);
+            } catch (error) {
+                setIsAuthenticated(false);
+            }
+        }
+        checkAuth();
+    }, []);
 
-    if(!authToken) {
-        console.log("No token found!")
-        return <Navigate to="/signup" replace/>
-    } else {
-        console.log("Found token")
-        return <Outlet/>;
-    }
-}
+
+    if (isAuthenticated === null) return null; 
+    return isAuthenticated ? <Outlet /> : <Navigate to="/signup" replace />;
+};
 
 export default ProtectedRoute;
