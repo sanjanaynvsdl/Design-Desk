@@ -8,15 +8,16 @@ import { orderHistoryAtomFam, orderTypes } from "../../store/orders-store";
 import LoadingComp from "../../components/ui/LoadingComp";
 import ErrorComp from "../../components/ui/ErrorComp";
 import EmptyState from "../../components/ui/EmptyState";
-import { LuShoppingBag } from "react-icons/lu";
+
 
 const SingleCustomerPage = () => {
   const { id } = useParams();
   const [isModal, setIsModal] = useState<boolean>(false);
   if (!id) return null;
 
-  //todo: BE get-req for a order history or customer and customer details
+  
   const orderHistory = useRecoilValueLoadable(orderHistoryAtomFam(id));
+
 
   if (orderHistory.state == "loading") {
     return <LoadingComp />;
@@ -73,8 +74,7 @@ const SingleCustomerPage = () => {
               className={`grid ${
                 orderHistory.contents.orders.length === 1
                   ? "grid-cols-1 place-items-center"
-                  : orderHistory.contents.orders.length === 2
-                  ? "md:grid-cols-2 grid-cols-1 place-items-center"
+                  
                   : "xl:grid-cols-3"
               } grid-cols-1 m-1 gap-4`}
             >

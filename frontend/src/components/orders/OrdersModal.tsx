@@ -4,6 +4,10 @@ import { IndianRupee, CircleX, Loader2 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { axiosInstance } from "../../utils/api/axios-instance";
+import SuccessMsg from "../ui/SuccessMsg";
+import ErrorMsg from "../ui/ErrorMsg";
+import {useRefreshAllOrders} from "../../store/orders-store";
+import {useRefreshAllCustomers} from "../../store/customers-store";
 
 interface OrderModalTypes {
   isOpen: boolean;
@@ -45,6 +49,10 @@ const OrdersModal = (props: OrderModalTypes) => {
   const [success, setSucessMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  //to dynamically update on adding new order, call this hhok
+  const refershAllOrders = useRefreshAllOrders(); 
+  const refreshCustomers = useRefreshAllCustomers();
+
   //update currTotal, Price
   useEffect(() => {
     setCurrTotal(currQuantity * currUnitPrice);
@@ -61,7 +69,6 @@ const OrdersModal = (props: OrderModalTypes) => {
     setTotalAmount(totalAmount);
   }, [orderData]);
 
-  //todo: payment status and orderStatus on serve side should be intialized to pending on creating a order!
   const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -81,32 +88,42 @@ const OrdersModal = (props: OrderModalTypes) => {
       console.log(response.data);
 
       if (response.data) {
-        setSucessMsg(response.data.message);
+        setSucessMsg(response.data?.message);
       }
+
+      
       setName("");
       setPhoneNo("");
       setEmail("");
       setPlace("");
+      setOrderData([]);
       setDeliveryDate(null);
       setDescription("");
       setTotalAmount(0);
-
-      setTimeout(() => {
+      
+      const timer = setTimeout(() => {
         setSucessMsg(null);
         props.onClose();
-      }, 5000);
+        refershAllOrders(); //to update UI- all orderds hook, 
+        refreshCustomers();
+      }, 3000);
+      
+      return ()=> clearTimeout(timer);
     } catch (error: any) {
       console.error(error);
 
       if (error.response) {
-        setError(error.response.data.message || "An unknown error occured!");
+        setError(error.response?.data?.message || "An unknown error occured!");
       } else {
         setError("An error occured, Please try again later!");
       }
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setError(null);
       }, 4000);
+
+      return()=> clearTimeout(timer);
+
     } finally {
       setIsLoading(false);
     }
@@ -129,6 +146,15 @@ const OrdersModal = (props: OrderModalTypes) => {
     setCurrTotal(0);
   };
 
+
+  const handleDeleteItem=(index:number)=>{
+    // const arr = orderData.filter((order, i)=>i!=index);
+    //this is how new array is being derived to set this.
+    //to modify existing array just, setIt
+    setOrderData(prevData => prevData.filter((_,i)=>i!=index));
+
+    
+  }
   //styles
   const orderDataInp =
     "px-2 py-1  outline-0 border-1 border-[#a19d9d] bg-[#f5eef4] text-md";
@@ -242,6 +268,7 @@ const OrdersModal = (props: OrderModalTypes) => {
                     <th className={`${tableStyles} text-white`}>Quantity</th>
                     <th className={`${tableStyles} text-white`}>Unit Price</th>
                     <th className={`${tableStyles} text-white`}>Total Price</th>
+                    <th className={`${tableStyles} text-white`}>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -255,7 +282,12 @@ const OrdersModal = (props: OrderModalTypes) => {
                       <td className={`${tableStyles}`}>{order.quantity}</td>
                       <td className={`${tableStyles}`}>{order.unitPrice}</td>
                       <td className={`${tableStyles}`}>{order.totalPrice}</td>
-                      {/* //todo: delete a item, from array */}
+                      <td className={`${tableStyles}`}>
+                        <button onClick={()=>handleDeleteItem(index)}
+                          className="bg-[#f7d7e4] hover:bg-[#d04971]  text-black rounded-md shadow-sm transition px-2 py-1 hover:cursor-pointer"
+                          >Delete</button>
+                      </td>
+                      
                     </tr>
                   ))}
                 </tbody>
@@ -276,6 +308,7 @@ const OrdersModal = (props: OrderModalTypes) => {
                 Total Amount Rs. {totalAmount}
               </div>
               <DatePicker
+                required
                 placeholderText="Delivery Date"
                 selected={deliveryDate}
                 onChange={(date: Date | null) => setDeliveryDate(date)}
@@ -285,6 +318,7 @@ const OrdersModal = (props: OrderModalTypes) => {
             </div>
             <div className="flex justify-center flex-col">
               <button
+              disabled={isLoading}
                 onClick={handleCreateOrder}
                 className={`bg-[#875479] text-white text-md px-14 p-2 my-1 rounded-xs transition transform active:scale-95 
                 ${
@@ -304,16 +338,8 @@ const OrdersModal = (props: OrderModalTypes) => {
               </button>
 
               <div className="flex justify-center break-words text-center my-2">
-                {error && (
-                  <p className="w-60  break-words overflow-hidden text-sm text-red-500 my-2 bg-red-100 p-2 rounded-sm border-1 border-red-300">
-                    {error}
-                  </p>
-                )}
-                {success && (
-                  <p className="w-60 break-words overflow-hidden text-sm text-green-500 my-2 bg-green-100 p-2 rounded-sm border-1 border-green-300">
-                    {success}
-                  </p>
-                )}
+                {error && <ErrorMsg message={error}/>}
+                {success && <SuccessMsg message={success}/>}
               </div>
             </div>
           </div>

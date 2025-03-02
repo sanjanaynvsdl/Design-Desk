@@ -7,7 +7,7 @@ import { IoMdAdd } from "react-icons/io";
 import ShareWorkModal from "../../components/workers/ShareWorkModal";
 import AddDailyWork from "../../components/workers/AddDailyWork";
 import { useRecoilValueLoadable } from "recoil";
-import { workersAtomFamily, WorkerTypes } from "../../store/workers-store";
+import { workersAtomFamily } from "../../store/workers-store";
 import LoadingComp from "../../components/ui/LoadingComp";
 import ErrorComp from "../../components/ui/ErrorComp";
 import EmptyState from "../../components/ui/EmptyState";
@@ -20,6 +20,7 @@ const SingleWorkerPage = () => {
   const [isAddWorkModal, setIsAddWordModal] = useState<boolean>(false);
 
   const worker = useRecoilValueLoadable(workersAtomFamily(id));
+  
 
   if (worker.state == "loading") {
     return <LoadingComp />;
@@ -135,7 +136,6 @@ const SingleWorkerPage = () => {
         />
       )}
 
-      {/* //todo Add workers daily work */}
       {isAddWorkModal && (
         <AddDailyWork
           id={worker.contents._id}

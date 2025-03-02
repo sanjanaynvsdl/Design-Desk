@@ -1,4 +1,4 @@
-import { selector,atom, atomFamily, selectorFamily } from "recoil";
+import { selector,atom, atomFamily, selectorFamily, useSetRecoilState, useRecoilValue } from "recoil";
 import { axiosInstance } from "../utils/api/axios-instance";
 
 export interface WorkerTypes {
@@ -21,9 +21,46 @@ interface workDataType{
     _id:string,
 }
 
-interface WorkerViewDataTypes{
-
+interface WorkerViewDataTypes {
+  _id: string;
+  hash: string;
+  workerId: {
+    _id: string;
+    name: string;
+    email: string;
+    phoneNo: string;
+    place: string;
+    description: string;
+    joinDate: string;
+    workData: workDataType[];
+  };
+  adminId: {
+    _id: string;
+    name: string;
+    email: string;
+    phoneNo:string
+  };
 }
+
+//refresh atom, for dynamic updates/delete
+export const refreshWorkersAtom = atom({
+  key:'refreshWorkerAtom',
+  default:0,
+});
+
+//refresh single worker
+export const refershSingleWorkerAtomFam = atomFamily({
+  key:'refreshSingleWorkerAtomFam',
+  default:0,
+});
+
+
+//refresh daily work, after updating it
+export const refreshDailyWork = atomFamily({
+  key:'refreshDailywork',
+  default:0
+});
+
 
 
 //get-all workers
@@ -31,11 +68,14 @@ export const workersAtom = atom<WorkerTypes[]>({
   key: "WorkersAtom",
   default: selector<WorkerTypes[]>({
     key: "WorkersSeclector",
-    get: async () => {
+    get: async ({get}) => {
+
+      get(refreshWorkersAtom);
+
       try {
         const response = await axiosInstance.get("/worker/");
         console.log(response.data);
-
+        
         //{data - message, workers[]}
         return response.data.workers;
         
@@ -53,7 +93,13 @@ export const workersAtomFamily = atomFamily<WorkerTypes, string>({
     key:"WorkerAtomFamily",
     default:selectorFamily<WorkerTypes,string>({
         key:"WorkerSelectorFamily",
-        get:(id:string)=>async()=> {
+        get:(id:string)=>async({get})=> {
+
+          get(refreshWorkersAtom);
+          get(refershSingleWorkerAtomFam(id));
+          get(refreshDailyWork(id));
+
+          
             try {
                 const response = await axiosInstance.get(`/worker/${id}`);
                 console.log(response.data);
@@ -69,6 +115,7 @@ export const workersAtomFamily = atomFamily<WorkerTypes, string>({
 });
 
 
+
 //get-wokers-work +admin info-> complete info
 // [not a protectedRoute] so, the worker can view their daily work.
 
@@ -77,13 +124,15 @@ export const workerViewAtom = atomFamily<WorkerViewDataTypes, string>({
   default:selectorFamily<WorkerViewDataTypes, string>({
 
     key:'WorkerViewSelectorFamily',
-    get:(id:string)=> async()=>{
+    get:(hash:string)=> async()=>{
     
+      
         try {
-          const response = await axiosInstance.get(`/worker/share/${id}`);
+          const response = await axiosInstance.get(`/worker/share/${hash}`);
           console.log(response.data);
           //data - {message, workData}
-          return response.data.workData
+          console.log(`Data of the worker is ${response.data}`);
+          return response.data.workerData
 
         } catch (error:any) {
           console.error(`Failed to load work data ${error}`);
@@ -92,6 +141,34 @@ export const workerViewAtom = atomFamily<WorkerViewDataTypes, string>({
         }
       }
     })
-})
+});
+
+//hook,
+export const useRefreshAllWorkers = ()=>{
+  const setRefreshWorkersAtom = useSetRecoilState(refreshWorkersAtom);
+  return ()=>{
+    setRefreshWorkersAtom(prev=>prev+1);
+  }
+}
+
+//hook, for singleworker
+export const useRefreshSingelWorker = (id:string)=> {
+  const setRefreshWorker = useSetRecoilState(refershSingleWorkerAtomFam(id));
+  
+  return ()=>{
+    setRefreshWorker(prev=>prev+1);
+  }
+}
+
+//hook to update dailyWork
+export const useRefreshDailyWork = (id:string)=>{
+
+  // console.log(`Entered for this ${id}`);
+  const setRefresher = useSetRecoilState(refreshDailyWork(id));
+
+  return ()=>{
+    setRefresher(prev=> prev+1);
+  }
+}
 
 

@@ -30,12 +30,12 @@ const orderSchema = z.object({
     ordersData:z.array( z
         .object({
             title:z.string({required_error:"Title for order is required!"}),
-            quantity:z.coerce.number().int().positive(),
-            unitPrice:z.coerce.number().positive(),
-            totalPrice:z.coerce.number().positive(),
+            quantity:z.coerce.number().int(),
+            unitPrice:z.coerce.number(),
+            totalPrice:z.coerce.number(),
         })), 
         
-    totalAmount:z.coerce.number().positive(),
+    totalAmount:z.coerce.number(),
     //coerce , if user-gives an "21" => converts to num => 21
     orderStatus:z.string({required_error:"Order status is required!"}).optional(),
     description:z.string({required_error:"Description for order is required"}),
@@ -74,8 +74,10 @@ orderRouter.post("/", userMiddleware, async(req:Request,res:Response)=>{
         //if-customer not found, create a new customer and save it, 
         let customerId;
 
-        if(findExistingCustomer) {
+        if(findExistingCustomer &&  findExistingCustomer.adminId?.toString()==adminId?.toString()) {
+            //added this check, so that we won't create for the customer that doesn't belong to admin
             customerId=findExistingCustomer._id;
+            
         } else {
             const newCustomer = await Customers.create({
                 name:name,

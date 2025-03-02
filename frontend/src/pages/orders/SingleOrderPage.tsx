@@ -24,7 +24,6 @@ const SingleOrderPage = ()=>{
             <ErrorComp message={order.contents?.message}/>
         )
     }
-    console.log(order.contents);
 
 
 
@@ -39,9 +38,9 @@ const SingleOrderPage = ()=>{
                 <p><span className="font-bold">Email : </span>{order.contents.customerId.email}</p>
                 </div>
 
-                <div className="flex flex-col">
+                <div className="flex flex-col ">
                     <p className="text-2xl my-4 font-bold">Order Details</p>
-                    
+                    <div className="flex justify-center mx-16">
                     <OrderDetails
                         id={order.contents._id}
                         ordersData={order.contents.ordersData}
@@ -52,6 +51,7 @@ const SingleOrderPage = ()=>{
                         paymentStatus={order.contents.paymentStatus}
                         createdAt={formatDate(order.contents.createdAt)}
                     />
+                    </div>
                 </div>
             </div>
 

@@ -3,6 +3,7 @@ import Input from "../components/ui/Input";
 import { axiosInstance } from "../utils/api/axios-instance";
 import { Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import ErrorMsg from "./ui/ErrorMsg";
 
 const SignIn = () => {
   const [email, setEmail] = useState<string>("");
@@ -24,18 +25,24 @@ const SignIn = () => {
       });
 
       console.log(response.data);
+      setEmail("");
+      setPassword("");
       navigate("/");
+      
     } catch (error: any) {
       console.error(error);
       if (error.response) {
-        setError(error.response.data.message || "An error occurred!");
+        setError(error.response?.data?.message || "An error occurred!");
       } else {
         setError("Please try again later, An error occurred!");
       }
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setError(null);
       }, 4000);
+
+      return ()=> clearTimeout(timer);
+
     } finally {
       setIsLoading(false);
     }
@@ -83,11 +90,7 @@ const SignIn = () => {
             </button>
           </div>
           <div className="flex justify-center">
-            {error && (
-              <p className="w-60  break-words overflow-hidden text-xs text-red-500 my-2 bg-red-100 p-2 rounded-sm border-1 border-red-300">
-                {error}
-              </p>
-            )}
+            {error && <ErrorMsg message={error}/>}
           </div>
 
           <p className="sm:text-md mt-2 text-sm">

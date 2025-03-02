@@ -4,16 +4,29 @@ import WorkerModal from "../../components/workers/WorkerModal";
 import { UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/format-date";
-import { workersAtom } from "../../store/workers-store";
+import { workersAtom, useRefreshAllWorkers } from "../../store/workers-store";
 import { useRecoilValueLoadable } from "recoil";
 import LoadingComp from "../../components/ui/LoadingComp";
 import ErrorComp from "../../components/ui/ErrorComp";
 import EmptyState from "../../components/ui/EmptyState";
+import { axiosInstance } from "../../utils/api/axios-instance";
+import ErrorMsg from "../../components/ui/ErrorMsg";
+import SuccessMsg from "../../components/ui/SuccessMsg";
+
 
 const WorkersPage = () => {
-  const [isModal, setIsModal] = useState<boolean>(false);
-  const workers = useRecoilValueLoadable(workersAtom);
+
   const navigate = useNavigate();
+  const workers = useRecoilValueLoadable(workersAtom);
+  const [isModal, setIsModal] = useState<boolean>(false);
+
+  const [error, setErrMsg]=useState<string|null>(null);
+  const [success, setSuccessMsg]=useState<string|null>(null);
+
+  //hook, to render UI after successful del
+  const refreshAllWorkers=useRefreshAllWorkers();
+
+
 
   if (workers.state == "loading") {
     return <LoadingComp />;
@@ -24,11 +37,40 @@ const WorkersPage = () => {
   }
 
   const tableInpStyles = "text-center px-4 py-2 border-1 border-gray-500";
-  const btnStyles =
-    "px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
+  const btnStyles ="px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
 
-  //todo: connect to BE" to delete a worker
-  const handleDelete = () => {};
+  
+  const handleDelete = async(id:string) => {
+    try {
+
+      setErrMsg(null);
+      const response = await axiosInstance.delete(`/worker/${id}`);
+      console.log(response.data);
+
+      setSuccessMsg(response.data?.message);
+
+      const timer = setTimeout(()=>{
+        setSuccessMsg(null);
+        refreshAllWorkers();
+      }, 2000);
+
+      return ()=> clearTimeout(timer);
+    } catch (error:any) {
+
+      console.error(`failed to delete worker ${error}`);
+      if(error.response) {
+        setErrMsg(error.response?.data?.message || "An error occurred while deleting worker!");
+      } else {
+        setErrMsg("Failed to delete worker data!")
+      }
+
+      const timer = setTimeout(()=>{
+        setErrMsg(null);
+      }, 3000);
+
+      return ()=> clearTimeout(timer);
+    }
+  };
 
   return (
     <div className=" flex flex-col justify-center items-center">
@@ -50,6 +92,11 @@ const WorkersPage = () => {
         {isModal && (
           <WorkerModal isOpen={isModal} onClose={() => setIsModal(false)} />
         )}
+      </div>
+      <div className="flex justify-center text-center mb-4">
+        {error && <ErrorMsg message={error}/>}
+        {success && <SuccessMsg message={success}/>}
+
       </div>
       <div className="flex justify-center">
         {workers.contents?.length == 0 ? (
@@ -92,6 +139,7 @@ const WorkersPage = () => {
                   </td>
                   <td className={`${tableInpStyles} `}>
                     <button
+                      onClick={()=>handleDelete(worker._id)}
                       className={`${btnStyles} bg-[#fae9f0] hover:bg-[#d04971]`}
                     >
                       Delete

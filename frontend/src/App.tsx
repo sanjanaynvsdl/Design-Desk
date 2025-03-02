@@ -36,9 +36,11 @@ function App() {
               <Route path="/orders/:id" element={<SingleOrderPage />} />
               <Route path="/customers/:id" element={<SingleCustomerPage />} />
               <Route path="/workers/:id" element={<SingleWorkerPage />} />
-              <Route path="/workers/share/:id" element={<ViewWorkPage />} />
             </Route>
           </Route>
+
+          {/* //workersdata- sharable link,  */}
+          <Route path="/workers/share/:hash" element={<ViewWorkPage />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </BrowserRouter>

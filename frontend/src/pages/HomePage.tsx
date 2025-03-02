@@ -3,23 +3,29 @@ import Button from "../components/ui/Button";
 import { ShoppingBag } from "lucide-react";
 import OrdersModal from "../components/orders/OrdersModal";
 import { useRecoilValueLoadable } from "recoil";
-import { ordersAtom, orderTypes } from "../store/orders-store";
+import {  orderTypes,pendingOrders } from "../store/orders-store";
 import OrderDetails from "../components/orders/OrderDetails";
 import { formatDate } from "../utils/format-date";
 import LoadingComp from "../components/ui/LoadingComp";
 import ErrorComp from "../components/ui/ErrorComp";
+import { userAtom } from "../store/user-store";
 
 const HomePage = () => {
   const [isModal, setIsModal] = useState<boolean>(false);
-  const orders = useRecoilValueLoadable(ordersAtom);
-  //todo: I should render pendingOrders here come after update functionality!
+  const orders = useRecoilValueLoadable(pendingOrders);
+  console.log(orders);
+  const adminData = useRecoilValueLoadable(userAtom);
+  
 
-  if (orders.state == "loading") {
+  if (orders.state == "loading" || adminData.state=="loading") {
     return <LoadingComp />;
   }
 
   if (orders.state == "hasError") {
     return <ErrorComp message={orders.contents?.message} />;
+  }
+  if (adminData.state=="hasError") {
+    return <ErrorComp message={adminData.contents?.message} />;
   }
 
   return (
@@ -45,7 +51,7 @@ const HomePage = () => {
         <div className="flex justify-center">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-4xl font-bold text-gray-800">
-              Hello, Naga Lakshmi 👋
+              Hello,  {`${adminData.contents.name}`} 👋
             </h1>
             <p className="text-xl text-gray-600 mt-2 font-semibold">
               Welcome to{" "}
@@ -72,7 +78,7 @@ const HomePage = () => {
                 <ul className=" text-gray-600 mt-2 space-y-1 text-left my-4 p-8 ">
                   <ul>📦 Manage orders & customers easily</ul>
                   <ul>📜 Auto-generate invoices in one click</ul>
-                  <ul>🔍 Find what you need with smart search</ul>
+                  <ul>🔍 Find what you need with search</ul>
                   <ul>📊 Track business growth with insights</ul>
                   <ul>👷 Add workers' daily tasks for easy tracking</ul>
                   <ul>

@@ -172,7 +172,7 @@ const workerLinks = new Schema({
   },
   adminId: {
     type:ObjectId,
-    ref:"Users",
+    ref:"User",
     required:true
   }
 });

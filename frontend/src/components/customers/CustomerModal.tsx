@@ -2,6 +2,9 @@ import { useState } from "react";
 import Input from "../ui/Input";
 import { CircleX, Loader2 } from "lucide-react";
 import { axiosInstance } from "../../utils/api/axios-instance";
+import ErrorMsg from "../ui/ErrorMsg";
+import SuccessMsg from "../ui/SuccessMsg";
+import {useRefreshAllCustomers} from '../../store/customers-store';
 
 interface customerModalTypes {
   isOpen: boolean;
@@ -9,6 +12,11 @@ interface customerModalTypes {
 }
 
 const CustomerModal = (props: customerModalTypes) => {
+
+  if (!props.isOpen) {
+    return;
+  }
+  
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phoneNo, setPhoneNo] = useState<string>("");
@@ -19,7 +27,10 @@ const CustomerModal = (props: customerModalTypes) => {
   const [success, setSucessMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  //todo:connect backend!
+  //hook to dynamically render ui
+  const refreshAllCustomers = useRefreshAllCustomers();
+
+
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -35,7 +46,7 @@ const CustomerModal = (props: customerModalTypes) => {
 
       console.log(response.data);
       if (response.data) {
-        setSucessMsg(response.data.message);
+        setSucessMsg(response.data?.message);
       }
 
       setName("");
@@ -43,30 +54,36 @@ const CustomerModal = (props: customerModalTypes) => {
       setPhoneNo("");
       setPlace("");
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setSucessMsg(null);
         props.onClose();
-      }, 4000);
+        refreshAllCustomers();
+      }, 2000);
+
+      return ()=> clearTimeout(timer);
+
+
     } catch (error: any) {
       console.error(error);
 
-      if (error.response.data) {
-        setError(error.response.data.message || "An error occurred!");
+      if (error.response) {
+        setError(error.response?.data?.message || "An error occurred!");
       } else {
         setError("Please try again, An error occurred!");
       }
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setError(null);
       }, 4000);
+
+      return ()=> clearTimeout(timer);
+
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!props.isOpen) {
-    return;
-  }
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center  bg-black/70 ">
@@ -136,17 +153,9 @@ const CustomerModal = (props: customerModalTypes) => {
             </button>
           </div>
 
-          <div className="flex justify-center break-words text-center my-2">
-            {error && (
-              <p className="w-60  break-words overflow-hidden text-sm text-red-500  bg-red-100 p-2 rounded-sm border-1 border-red-300">
-                {error}
-              </p>
-            )}
-            {success && (
-              <p className="w-60 break-words overflow-hidden text-sm text-green-500 bg-green-100 p-2 rounded-sm border-1 border-green-300">
-                {success}
-              </p>
-            )}
+          <div className="flex justify-center break-words text-center my-1">
+            {error && <ErrorMsg message={error}/>}
+            {success && <SuccessMsg  message={success}/>}
           </div>
         </form>
       </div>

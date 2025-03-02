@@ -21,7 +21,7 @@ const DashboardLayout = () => {
       <SideBar isOpen={isSideBar} setIsOpen={setIsSideBar} />
       <div
         className={`flex-1 transition-all duration-300 p-4 bg-[#f5eef4] min-h-screen relative
-                ${isSideBar ? "sm:ml-72" : "ml-20"}`}
+                ${isSideBar ? "sm:ml-72" : "ml-20"} overflow-x-hidden`}
       >
         <Outlet />
       </div>

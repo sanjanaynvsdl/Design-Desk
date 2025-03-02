@@ -1,27 +1,79 @@
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/format-date";
 import { useRecoilValueLoadable } from "recoil";
-import { ordersAtom, orderTypes } from "../../store/orders-store";
+import { ordersAtom, orderTypes, useRefreshAllOrders } from "../../store/orders-store";
 import { LuShoppingBag } from "react-icons/lu";
 import LoadingComp from "../../components/ui/LoadingComp";
 import ErrorComp from "../../components/ui/ErrorComp";
 import EmptyState from "../../components/ui/EmptyState";
+import { useState } from "react";
+import { axiosInstance } from "../../utils/api/axios-instance";
+import ErrorMsg from "../../components/ui/ErrorMsg";
+import SuccessMsg from "../../components/ui/SuccessMsg";
 
 const OrdersPage = () => {
-  const tableStyles = "px-4 py-2 border-1 border-gray-500";
-  const btnStyles =
-    "px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
   const navigate = useNavigate();
-
   const orders = useRecoilValueLoadable(ordersAtom);
+  const refershAllOrders=useRefreshAllOrders();
 
-  console.log(orders);
+  const [isLoading, setIsLoading]=useState<boolean>(false);
+  const [error, setErrorMsg]=useState<string|null>(null);
+  const [success, setSuccessMsg]=useState<string|null>(null);
+
+  const [searchQuery, setSearchquery]=useState<string>("");
+
+  
+  
+  const tableStyles = "px-4 py-2 border-1 border-gray-500";
+  const btnStyles ="px-4 py-1  text-black rounded-md shadow-sm transition ";
+
   if (orders.state == "loading") {
     return <LoadingComp />;
   }
-
+  
   if (orders.state == "hasError") {
     return <ErrorComp message={orders.contents?.message} />;
+  }
+  
+  // const filteredorders = orders.contents.filter((order)=>(
+  //   order.customerId.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // ));
+
+
+  const handleDeleteOrder=async(id:string)=>{
+    try {
+      setIsLoading(true);
+      setErrorMsg(null);
+
+      const response = await axiosInstance.delete(`/order/${id}`);
+      console.log(response);
+      setSuccessMsg(response?.data?.message);
+
+      const timer =setTimeout(()=>{
+        setSuccessMsg(null);
+        refershAllOrders();
+      }, 3000);
+
+      return()=> clearTimeout(timer);
+      
+    } catch (error:any) {
+      console.error(`Error while deleting order ${error}`);
+      if(error.response) {
+        setErrorMsg(error.response?.data?.message || "An error occurred while deleting order!");
+      } else {
+        setErrorMsg("An error occurred while deleting order!")
+      }
+
+      const timer = setTimeout(()=>{
+        setErrorMsg(null);
+      },3000);
+
+      return ()=> clearTimeout(timer);
+      
+    } finally{
+      setIsLoading(false);
+    }
+
   }
 
   return (
@@ -34,10 +86,16 @@ const OrdersPage = () => {
             </p>
             <input
               placeholder="Search for a order"
+              onChange={(e)=>setSearchquery(e.target.value)}
               className="outline-none pr-8 pl-2 py-2 bg-white  border-1 border-[#797474] rounded-xs"
             />
           </div>
         )}
+      </div>
+
+      <div className="flex justify-center text-center">
+        {error && <ErrorMsg message={error}/>}
+        {success && <SuccessMsg message={success}/>}
       </div>
 
       {orders.contents.length == 0 ? (
@@ -47,8 +105,7 @@ const OrdersPage = () => {
             Icon={<LuShoppingBag size={25} />}
           />
       ) : (
-        <div className="flex justify-center my-4">
-          {orders && (
+        <div className="flex justify-center my-4 mx-10">
             <table className="bg-white shadow-md">
               <thead className="bg-[#ddc4da]">
                 <tr>
@@ -64,11 +121,11 @@ const OrdersPage = () => {
               </thead>
 
               <tbody>
-                {orders.contents.map((order: orderTypes, index: number) => (
+                {orders.contents?.map((order: orderTypes, index: number) => (
                   <tr key={index}>
                     <td className={`${tableStyles}`}>{index + 1}</td>
                     <td className={`${tableStyles}`}>
-                      {order.customerId.name}
+                      {order.customerId?.name}
                     </td>
                     {/* <td>{order.customerId.phoneNo}</td> */}
                     <td className={`${tableStyles}`}>{order.description}</td>
@@ -81,17 +138,21 @@ const OrdersPage = () => {
                         onClick={() => {
                           navigate(`/orders/${order._id}`);
                         }}
-                        className={`${btnStyles} bg-[#ecdeea] hover:bg-[#ddc4da]`}
+                        className={`${btnStyles} bg-[#ecdeea] hover:bg-[#ddc4da] cursor-pointer`}
                       >
                         Get-Details
                       </button>
                     </td>
                     <td className={`${tableStyles}`}>
-                      {/* //todo: connect to BE */}
                       <button
-                        onClick={() => {}}
-                        className={`${btnStyles} bg-[#fae9f0] hover:bg-[#d04971]`}
-                      >
+                        disabled={isLoading}
+                        onClick={()=>handleDeleteOrder(order._id)}
+                        className={`${btnStyles} bg-[#f7d7e4] hover:bg-[#d04971]
+                        ${isLoading ? 
+                          "opacity-30 cursor-not-allowed"
+                            :"hover:scale-102 cursor-pointer"
+                        }
+                      `}>
                         Delete
                       </button>
                     </td>
@@ -99,7 +160,6 @@ const OrdersPage = () => {
                 ))}
               </tbody>
             </table>
-          )}
         </div>
       )}
     </div>

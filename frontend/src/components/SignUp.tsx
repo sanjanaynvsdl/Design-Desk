@@ -3,6 +3,7 @@ import { useState } from "react";
 import { axiosInstance } from "../utils/api/axios-instance";
 import { Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import ErrorMsg from "./ui/ErrorMsg";
 
 const SignUp = () => {
   const [name, setName] = useState<string>("");
@@ -28,26 +29,26 @@ const SignUp = () => {
         password: password,
       });
       console.log(response.data);
-      navigate("/");
-
       //onSuccess - reset values.
       setName("");
       setEmail("");
       setPhoneNo("");
       setPassword("");
+      navigate("/");
 
     } catch (error: any) {
       console.error(error);
       if (error.response) {
-        setError(error.response.data.message || "An error occurred!");
+        setError(error.response.data?.message || "An error occurred!");
       } else {
         setError("An error occured! Please try again after some time. ");
       }
 
-      setTimeout(()=>{
+      const timer = setTimeout(()=>{
         setError(null);
-
       },4000);
+
+      return ()=>clearTimeout(timer);
       
     } finally {
       setIsLoading(false);
@@ -123,11 +124,7 @@ const SignUp = () => {
 
 
           <div className="flex justify-center break-words">
-            {error && (
-              <p className="w-60  break-words overflow-hidden text-xs text-red-500 my-2 bg-red-100 p-2 rounded-sm border-1 border-red-300">
-                {error}
-              </p>
-            )}
+            {error && <ErrorMsg message={error}/>}
           </div>
         </form>
       </div>

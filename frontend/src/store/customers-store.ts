@@ -1,4 +1,4 @@
-import {atom, atomFamily, selector, selectorFamily} from 'recoil';
+import {atom, atomFamily, selector, selectorFamily, useRecoilValue, useSetRecoilState} from 'recoil';
 import { axiosInstance } from '../utils/api/axios-instance';
 
 
@@ -16,12 +16,30 @@ export interface CustomerDetailedTypes {
 }
 
 
+//refresh atom, when-ever customer data is updated/deleted call this.
+export const refreshCustomerAtom = atom({
+    key:'refreshCustomerAtom',
+    default:0,
+});
+
+//refresh single customer 
+export const  refreshSingleCustomerAtomFam = atomFamily({
+    key:'refreshSingleCustomerAtomFam',
+    default:0
+});
+
+
+
+
 //get-all-customer data
 export const customersAtom = atom<CustomerDetailedTypes[]>({
     key:'customersAtom',
     default:selector<CustomerDetailedTypes[]>({
         key:'customersSelector',
-        get:async()=>{
+        get:async({get})=>{
+
+            get(refreshCustomerAtom);
+
             try {
                 const response = await axiosInstance.get("/customer/");
                 console.log(response.data);
@@ -40,7 +58,13 @@ export const customerAtomFamily = atomFamily<CustomerDetailedTypes, string>({
     key:'CustomerAtomFamily',
     default:selectorFamily<CustomerDetailedTypes,string>({
         key:'CustomerSelectorFamily',
-        get:(id:string)=> async()=>{
+        get:(id:string)=> async({get})=>{
+
+          
+           get(refreshCustomerAtom);
+           get(refreshSingleCustomerAtomFam(id));
+            console.log(`SIngle customer data changed!`); 
+
             try {
                 const response = await axiosInstance.get(`/customer/${id}`);
                 console.log(response.data);
@@ -52,4 +76,27 @@ export const customerAtomFamily = atomFamily<CustomerDetailedTypes, string>({
         }
     })
 });
+
+
+
+//hook to call refrsh atom or update
+export const useRefreshAllCustomers = ()=>{
+    const setRefreshCustomerAtom = useSetRecoilState(refreshCustomerAtom);
+
+    return ()=>{
+        setRefreshCustomerAtom(prev=>prev+1);
+    }
+}
+
+
+//hhook, to update/fetch singel customer datta
+export const useRefreshSingleCustomer = (id:string)=>{
+const setRefreshAtomFam = useSetRecoilState(refreshSingleCustomerAtomFam(id));
+const refreshValue = useRecoilValue(refreshSingleCustomerAtomFam(id));
+
+console.log(`The refreshed value is ` +refreshValue);
+    return ()=>{
+        setRefreshAtomFam(prev =>prev+1);
+    }
+}
 

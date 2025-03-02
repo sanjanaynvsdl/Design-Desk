@@ -4,6 +4,9 @@ import { CircleX, Loader2 } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { axiosInstance } from "../../utils/api/axios-instance";
+import ErrorMsg from "../ui/ErrorMsg";
+import SuccessMsg from "../ui/SuccessMsg";
+import {useRefreshAllWorkers} from '../../store/workers-store';
 
 interface WorkerModalTypes {
   isOpen: boolean;
@@ -26,6 +29,9 @@ const WorkerModal = (props: WorkerModalTypes) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSucessMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  //hook to udpate UI dynamically after, api call
+  const refreshAllWorkers = useRefreshAllWorkers();
 
   const handleAddWorker = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,22 +61,29 @@ const WorkerModal = (props: WorkerModalTypes) => {
       setDescripition("");
       setJoinDate(null);
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setSucessMsg(null);
         props.onClose();
+        refreshAllWorkers();
       }, 3000);
+
+      return ()=> clearTimeout(timer);
+
     } catch (error: any) {
       console.error(error);
 
-      if (error.response.data) {
-        setError(error.response.data.message || "An error occurred!");
+      if (error.response) {
+        setError(error.response?.data?.message || "An error occurred!");
       } else {
         setError("Please try again later, An error occurred!");
       }
 
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setError(null);
       }, 3000);
+
+      return ()=> clearTimeout(timer);
+
     } finally {
       setIsLoading(false);
     }
@@ -168,17 +181,9 @@ const WorkerModal = (props: WorkerModalTypes) => {
           </div>
 
           {/* handle success or error msg's */}
-          <div className="flex justify-center text-center my-1">
-            {error && (
-              <p className="w-60  break-words overflow-hidden text-sm text-red-500  bg-red-100 p-2 rounded-sm border-1 border-red-300">
-                {error}
-              </p>
-            )}
-            {success && (
-              <p className="w-60 break-words overflow-hidden text-sm text-green-500 bg-green-100 p-2 rounded-sm border-1 border-green-300">
-                {success}
-              </p>
-            )}
+          <div className="flex justify-center text-center">
+            {error && <ErrorMsg message={error}/>}
+            {success && <SuccessMsg message={success}/>}
           </div>
         </form>
       </div>

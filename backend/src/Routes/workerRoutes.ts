@@ -53,7 +53,6 @@ type dailyWorkTypes = z.infer<typeof dailyWorkSchema>
 
 
 //create a worker
-//todo:check from frotend, weather work Data is required or not,
 workerRouter.post("/", userMiddleware, async(req:Request,res:Response)=> {
     try {
         const result = workersSchema.safeParse(req.body);
@@ -421,9 +420,10 @@ workerRouter.get("/share/:hash", async(req:Request, res:Response)=>{
         return;
     }
     try {
-        const workerData = await WorkersLinks.findOne({
-            hash:hash,
-        }).populate("workerId", "name phoneNo email place description workData");
+        const workerData = await WorkersLinks.findOne({ hash })
+        .populate("workerId", "name phoneNo email place description workData joinDate")
+        .populate("adminId", "name email phoneNo"); 
+
 
     
         if(workerData) {

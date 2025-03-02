@@ -1,4 +1,4 @@
-import { atom, atomFamily, selector, selectorFamily } from "recoil";
+import { atom, atomFamily, selector, selectorFamily, useRecoilState, useSetRecoilState } from "recoil";
 import { axiosInstance } from "../utils/api/axios-instance";
 import {CustomerDetailedTypes} from "./customers-store";
 
@@ -49,12 +49,43 @@ interface OrderHistoryTypes {
 * contents (contains data)
 */
 
+
+//-----------------------------------------------------------------------------------------------------------------
+//to dynamically render UI, when-ever update,delete,or new order is being added
+//use, refresh token,
+/*
+1. Create refresh atom/atomFamily as per requirement.
+2. use this in the selector
+3. A hook to update the count of this.
+4. use this hook after update/delete/post calls
+5. As we call hook  -> updates atom -> this change will call specifc selector where-ever atom is being used
+*/
+//--------------------------------------------------------------------------------------------------------------
+
+
+//refresh when-only one order changes (so atom-family)
+export const orderRefershAtomFam = atomFamily({
+    key:'orderRefreshTriggerAtomFamily',
+    default:0
+});
+
+//refresh-all orders on delete/add/update
+export const ordersRefreshAtom = atom({
+    key:'ordersRefereshAtom',
+    default:0,
+});
+
+
+
 //get-all orders of admin.
 export const ordersAtom = atom<orderTypes[]>({
     key:'Orders',
     default:selector({
         key:'ordersSelector',
-        get:async()=>{
+        get:async({get})=>{
+
+            get(ordersRefreshAtom); 
+
             try {
                 const response = await axiosInstance.get("/order/");
                 console.log(response.data);
@@ -67,7 +98,7 @@ export const ordersAtom = atom<orderTypes[]>({
     })
 });
 
-//todo: after writng the update functionality.
+
 //pending-orders [Home-Page] derived from ordersAtom 
 export const pendingOrders = selector<orderTypes[]>({
     key:'pending-orders',
@@ -84,7 +115,12 @@ export const orderAtomFam = atomFamily<orderTypes, string>({
     key:'orderAtomFamily',
     default:selectorFamily<orderTypes, string>({
         key:'orderSelectorFamily',
-        get:(id:string) => async()=>{
+        get:(id:string) =>async({get})=>{
+
+            get(orderRefershAtomFam(id));  //call-for specific id
+            get(ordersRefreshAtom);  //get-all orders again.
+
+
             try {
                 const response = await axiosInstance.get(`/order/${id}`);
                 console.log(response.data);
@@ -103,7 +139,9 @@ export const orderHistoryAtomFam = atomFamily<OrderHistoryTypes, string>({
     key:'OrderHistoryAtomFam',
     default:selectorFamily<OrderHistoryTypes, string>({
         key:'OrderHistorySelectoryFam',
-        get:(id:string)=> async()=>{
+        get:(id:string)=> async({get})=>{
+
+            get(ordersRefreshAtom);
             try {
                 const response = await axiosInstance.get(`/order/customer/${id}`);
                 console.log(response.data);
@@ -118,5 +156,24 @@ export const orderHistoryAtomFam = atomFamily<OrderHistoryTypes, string>({
     })
 });
 
+
+
+//hook to refresh order with [id]
+export const useRefreshOrder = (id:string)=> {
+    const setRefreshTrigger = useSetRecoilState(orderRefershAtomFam(id));
+    return ()=>{
+        console.log(`Refreshing individual order ${id}`);
+        setRefreshTrigger(prev=> prev+1);
+    }
+}
+
+//hook to re-fresh all ordes
+export const useRefreshAllOrders = ()=>{
+    const setAllOrderAtom = useSetRecoilState(ordersRefreshAtom);
+
+    return()=>{
+        setAllOrderAtom(prev=>prev+1);
+    }
+}
 
 

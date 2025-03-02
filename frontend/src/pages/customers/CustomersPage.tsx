@@ -1,20 +1,27 @@
 import Button from "../../components/ui/Button";
 import { useState } from "react";
 import CustomerModal from "../../components/customers/CustomerModal";
-import { UserRound } from "lucide-react";
+import {  UserRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValueLoadable } from "recoil";
-import { customersAtom } from "../../store/customers-store";
+import { customersAtom, useRefreshAllCustomers } from "../../store/customers-store";
 import LoadingComp from "../../components/ui/LoadingComp";
 import ErrorComp from "../../components/ui/ErrorComp";
 import EmptyState from "../../components/ui/EmptyState";
+import { axiosInstance } from "../../utils/api/axios-instance";
+import ErrorMsg from "../../components/ui/ErrorMsg";
+import SuccessMsg from "../../components/ui/SuccessMsg";
 
 const CustomersPage = () => {
-  const [isModal, setIsModal] = useState(false);
+
   const navigate = useNavigate();
+  const [isModal, setIsModal] = useState(false);
   const customers = useRecoilValueLoadable(customersAtom);
 
-  //todo: if it's only returing and, if data is set is should load it
+  const [error, setErrMsg]=useState<string|null>(null);
+  const [success, setSuccessMsg]=useState<string|null>(null);
+  const refreshAllCustomers=useRefreshAllCustomers();
+
   if (customers.state == "loading") {
     return <LoadingComp />;
   }
@@ -28,10 +35,41 @@ const CustomersPage = () => {
   const btnStyles =
     "px-4 py-1  text-black rounded-md shadow-sm transition cursor-pointer";
 
-  //delete customer--
-  //todo:connect to BE, to delete a customer,
-  const handleDelCustomer = () => {
-    alert(`Are you sure want to delete the customer with id`);
+  
+
+    //delete-customer (id)
+  const handleDelCustomer = async(id:string) => {
+    try {
+      setErrMsg(null);
+
+      const response = await axiosInstance.delete(`/customer/${id}`);
+
+      console.log(response.data);
+      setSuccessMsg(response.data?.message);
+
+      const timer = setTimeout(()=>{
+        setSuccessMsg(null);
+        refreshAllCustomers();
+      },2000);
+
+      return ()=> clearTimeout(timer);
+    } catch (error:any) {
+
+      console.error(`Error while deleting customer ${error}`);
+      if(error.response) {
+        setErrMsg(error.response?.data?.message || "An error occured while deleting customer!");
+      } else {
+        setErrMsg("Failed to delete customer!")
+      }
+
+      const timer = setTimeout(()=>{
+        setErrMsg(null);
+      },3000);
+
+      return ()=> clearInterval(timer);
+      
+    }
+    
   };
 
   return (
@@ -55,6 +93,11 @@ const CustomersPage = () => {
           text="Add Customer"
           onClick={() => setIsModal(true)}
         />
+      </div>
+      <div className="flex justify-center text-center mb-2">
+        {error && <ErrorMsg message={error}/>}
+        {success && <SuccessMsg message={success}/>}
+
       </div>
 
       {isModal && (
@@ -102,7 +145,7 @@ const CustomersPage = () => {
                   <td className={`${tableStyles}`}>
                     <button
                       className={`${btnStyles} bg-[#fae9f0] hover:bg-[#d04971]`}
-                      onClick={handleDelCustomer}
+                      onClick={()=>handleDelCustomer(customer._id)}
                     >
                       Delete
                     </button>
@@ -118,5 +161,3 @@ const CustomersPage = () => {
 };
 
 export default CustomersPage;
-
-//todo: A pop for alert do delete
