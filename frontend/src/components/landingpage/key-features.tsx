@@ -1,8 +1,34 @@
+import { useEffect, useState } from "react";
 import { TbShoppingCartBolt } from "react-icons/tb";
 import { MdOutlineReceiptLong } from "react-icons/md";
 import { IoPeopleOutline } from "react-icons/io5";
 
 export const KeyFeatures = () => {
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setIsVisible(true);
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        const element = document.getElementById("features");
+        if (element) {
+            observer.observe(element);
+        }
+
+        return () => {
+            if (element) {
+                observer.unobserve(element);
+            }
+        };
+    }, []);
     const features = [
         {
             icon: <TbShoppingCartBolt size={40} />,
@@ -24,7 +50,11 @@ export const KeyFeatures = () => {
     return (
         <div id="features" className="w-full py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-[#f5eef4]">
             <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-12 sm:mb-16">
+                <div 
+                    className={`text-center mb-12 sm:mb-16 transition-all duration-700 ease-out ${
+                        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                    }`}
+                >
                     <h2 className="text-3xl tracking-tighter sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
                         Key Features
                     </h2>
@@ -37,7 +67,12 @@ export const KeyFeatures = () => {
                     {features.map((feature, index) => (
                         <div
                             key={index}
-                            className="group p-6 sm:p-8 bg-white border-2 border-gray-200 rounded-xl hover:border-[#875479] transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
+                            className={`group p-6 sm:p-8 bg-white border-2 border-gray-200 rounded-xl hover:border-[#875479] transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 ${
+                                isVisible 
+                                    ? 'opacity-100 translate-y-0' 
+                                    : 'opacity-0 translate-y-6'
+                            }`}
+                            style={{ transitionDelay: `${index * 150}ms` }}
                         >
                             <div className="text-[#875479] mb-4 group-hover:scale-110 transition-transform duration-300">
                                 {feature.icon}
