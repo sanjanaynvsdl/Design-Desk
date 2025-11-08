@@ -148,7 +148,7 @@ const filteredCustomers = customers.contents.filter((customer)=>(
 
                   <td className={`${tableStyles} `}>
                     <button
-                      onClick={() => navigate(`/customers/${customer._id}`)}
+                      onClick={() => navigate(`/home/customers/${customer._id}`)}
                       className={`${btnStyles} bg-[#ecdeea] hover:bg-[#ddc4da]`}
                     >
                       Get-history

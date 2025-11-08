@@ -146,7 +146,7 @@ const OrdersPage = () => {
                   <td className={`${tableStyles}`}>
                     <button
                       onClick={() => {
-                        navigate(`/orders/${order._id}`);
+                        navigate(`/home/orders/${order._id}`);
                       }}
                       className={`${btnStyles} bg-[#ecdeea] hover:bg-[#ddc4da] cursor-pointer`}
                     >

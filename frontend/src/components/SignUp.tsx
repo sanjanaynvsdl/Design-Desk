@@ -34,7 +34,7 @@ const SignUp = () => {
       setEmail("");
       setPhoneNo("");
       setPassword("");
-      navigate("/");
+      navigate("/home");
 
     } catch (error: any) {
       console.error(error);

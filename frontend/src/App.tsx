@@ -27,17 +27,17 @@ function App() {
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<DashboardLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/customers" element={<CustomersPage />} />
-              <Route path="/workers" element={<WorkersPage />} />
-              <Route path="/myprofile" element={<MyProfilePage />} />
+            <Route path="/home" element={<DashboardLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="customers" element={<CustomersPage />} />
+              <Route path="workers" element={<WorkersPage />} />
+              <Route path="myprofile" element={<MyProfilePage />} />
 
               {/* {data of particular id} */}
-              <Route path="/orders/:id" element={<SingleOrderPage />} />
-              <Route path="/customers/:id" element={<SingleCustomerPage />} />
-              <Route path="/workers/:id" element={<SingleWorkerPage />} />
+              <Route path="orders/:id" element={<SingleOrderPage />} />
+              <Route path="customers/:id" element={<SingleCustomerPage />} />
+              <Route path="workers/:id" element={<SingleWorkerPage />} />
             </Route>
           </Route>
 

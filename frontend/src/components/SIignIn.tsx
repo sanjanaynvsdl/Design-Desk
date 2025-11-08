@@ -27,7 +27,7 @@ const SignIn = () => {
       console.log(response.data);
       setEmail("");
       setPassword("");
-      navigate("/");
+      navigate("/home");
       
     } catch (error: any) {
       console.error(error);

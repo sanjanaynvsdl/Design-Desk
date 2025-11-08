@@ -144,7 +144,7 @@ const WorkersPage = () => {
                   </td>
                   <td className={`${tableInpStyles} `}>
                     <button
-                      onClick={() => navigate(`/workers/${worker._id}`)}
+                      onClick={() => navigate(`/home/workers/${worker._id}`)}
                       className={`${btnStyles} bg-[#ecdeea] hover:bg-[#ddc4da]`}
                     >
                       Get-Details

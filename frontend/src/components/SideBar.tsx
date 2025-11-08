@@ -73,14 +73,14 @@ const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
           setCurrPage("Home");
         }}
         currPage={currPage}
-        navigateTo={() => navigate("/")}
+        navigateTo={() => navigate("/home")}
         StartIcon={<AiOutlineHome size={25} />}
       />
       <SideBarItem
         text="Orders"
         isOpen={isOpen}
         currPage={currPage}
-        navigateTo={() => navigate("/orders")}
+        navigateTo={() => navigate("/home/orders")}
         onClick={() => {
           setCurrPage("Orders");
         }}
@@ -91,7 +91,7 @@ const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
         text="Customers"
         isOpen={isOpen}
         currPage={currPage}
-        navigateTo={() => navigate("/customers")}
+        navigateTo={() => navigate("/home/customers")}
         onClick={() => {
           setCurrPage("Customers");
         }}
@@ -102,7 +102,7 @@ const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
         text="Workers"
         currPage={currPage}
         isOpen={isOpen}
-        navigateTo={() => navigate("/workers")}
+        navigateTo={() => navigate("/home/workers")}
         onClick={() => {
           setCurrPage("Workers");
         }}
@@ -113,7 +113,7 @@ const SideBar = ({ isOpen, setIsOpen }: SideBarTypes) => {
         text="My Profile"
         currPage={currPage}
         isOpen={isOpen}
-        navigateTo={() => navigate("/myprofile")}
+        navigateTo={() => navigate("/home/myprofile")}
         onClick={() => {
           setCurrPage("My Profile");
         }}
