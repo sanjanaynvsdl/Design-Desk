@@ -1,7 +1,7 @@
 import Input from "../components/ui/Input";
 import { useState } from "react";
 import { axiosInstance } from "../utils/api/axios-instance";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import ErrorMsg from "./ui/ErrorMsg";
 
@@ -56,7 +56,14 @@ const SignUp = () => {
   };
 
   return (
-    <div className="bg-white md:px-14 px-6 md:py-12 py-8   inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-xl mb-[100px]">
+    <div className="bg-white md:px-14 px-6 md:py-12 py-8 inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-xl relative">
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-4 left-4 p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
+        aria-label="Go back to home"
+      >
+        <ArrowLeft size={20} />
+      </button>
       <div className="flex flex-col">
         <form onSubmit={handleSubmit} className="">
           <p className="text-2xl font-bold mb-4">SIGN UP</p>

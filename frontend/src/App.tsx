@@ -14,12 +14,14 @@ import MyProfilePage from "./pages/MyProfilePage";
 import ViewWorkPage from "./pages/workers/ViewWorkPage";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/Protected-route";
+import {LandingPage} from "./pages/LandingPage";
 
 function App() {
   return (
     <RecoilRoot>
       <BrowserRouter>
         <Routes>
+          <Route path = "/" element = {<LandingPage/>} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
 

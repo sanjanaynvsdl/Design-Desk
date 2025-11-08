@@ -48,10 +48,15 @@ const SignIn = () => {
     }
   };
   return (
-    <div className="bg-white md:px-10  px-4 md:py-12 py-6 inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-lg mb-[100px]">
+    <div className="bg-white md:px-14 px-6 md:py-12 py-8 inline-block text-center border-2 border-[#e3e3e3] shadow-2xl rounded-xl">
       <form onSubmit={handleSignIn}>
         <div className="flex flex-col">
           <p className="text-2xl font-bold mb-4">SIGN IN</p>
+          <p className="mb-3 md:text-md text-sm">
+            Welcome back!
+            <br />
+            —Sign in to continue
+          </p>
           <Input
             placeholder="Email"
             type="text"
@@ -93,9 +98,9 @@ const SignIn = () => {
             {error && <ErrorMsg message={error}/>}
           </div>
 
-          <p className="sm:text-md mt-2 text-sm">
-            Don't have an account?{"  "}
-            <Link to="/signup" className="text-blue-600 underline">
+          <p className="md:text-sm mt-2 text-sm">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-blue-900 underline">
               SignUp
             </Link>
           </p>
